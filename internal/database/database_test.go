@@ -2,14 +2,14 @@ package database
 
 import (
 	"context"
-	"github.com/testcontainers/testcontainers-go"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 	"testing"
 	"time"
 
+	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -111,7 +111,9 @@ func TestMongoDBStore_SaveTrade(t *testing.T) {
 	defer cancel()
 
 	var result map[string]interface{}
+
 	filter := bson.M{"_id": oid}
+
 	if err = mongoInstance.db.Collection("rateBTC/USDT").FindOne(ctx, filter).Decode(&result); err != nil {
 		t.Fatalf("Cannot find data: %v", err)
 	}

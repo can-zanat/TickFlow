@@ -2,10 +2,10 @@ package binance
 
 import (
 	"TickFlow/configs"
+	"TickFlow/internal/observer"
 	"log"
 	"net/http"
 
-	"TickFlow/internal/observer"
 	"github.com/gorilla/websocket"
 )
 
@@ -16,10 +16,15 @@ func Connect(subject *observer.Subject) error {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
-	conn, _, err := websocket.DefaultDialer.Dial(config.BinanceURL, http.Header{})
+	conn, resp, err := websocket.DefaultDialer.Dial(config.BinanceURL, http.Header{})
 	if err != nil {
 		return err
 	}
+
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+
 	defer conn.Close()
 
 	log.Println("Binance WebSocket connection create properly!")
@@ -27,10 +32,12 @@ func Connect(subject *observer.Subject) error {
 	for {
 		var message map[string]interface{}
 		err = conn.ReadJSON(&message)
+
 		if err != nil {
 			log.Println("JSON parse error:", err)
 			break
 		}
+
 		subject.Notify(message)
 	}
 
