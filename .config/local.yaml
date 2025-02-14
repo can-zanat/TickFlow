@@ -1,0 +1,5 @@
+# .config/local.yaml
+mongoDB:
+  uri: "mongodb://localhost:27017"
+
+binanceURL: "wss://stream.binance.com:9443/ws/btcusdt@ticker"
