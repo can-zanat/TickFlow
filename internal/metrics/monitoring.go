@@ -7,6 +7,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const trashHold = 10 * time.Second
+
 var (
 	memAllocGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "go_mem_alloc_bytes",
@@ -16,14 +18,16 @@ var (
 
 func init() {
 	prometheus.MustRegister(memAllocGauge)
-	go monitorMemStats()
-}
 
-func monitorMemStats() {
-	var memStats runtime.MemStats
-	for {
-		runtime.ReadMemStats(&memStats)
-		memAllocGauge.Set(float64(memStats.Alloc))
-		time.Sleep(10 * time.Second)
+	monitorMemStats := func() {
+		var memStats runtime.MemStats
+
+		for {
+			runtime.ReadMemStats(&memStats)
+			memAllocGauge.Set(float64(memStats.Alloc))
+			time.Sleep(trashHold)
+		}
 	}
+
+	go monitorMemStats()
 }

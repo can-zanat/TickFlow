@@ -37,8 +37,10 @@ func dialAndListen(subject *observer.Subject, url string, attempt int) error {
 	if err != nil {
 		log.Printf("Attempt %d: Failed to establish WebSocket connection: %v", attempt+1, err)
 		time.Sleep(trashHold)
+
 		return dialAndListen(subject, url, attempt+1)
 	}
+
 	if resp != nil {
 		resp.Body.Close()
 	}
@@ -50,6 +52,7 @@ func dialAndListen(subject *observer.Subject, url string, attempt int) error {
 	if err != nil {
 		log.Printf("Connection error: %v. Retrying reconnection (Attempt %d)...", err, attempt+1)
 		time.Sleep(trashHold)
+
 		return dialAndListen(subject, url, attempt+1)
 	}
 
@@ -66,6 +69,7 @@ func handleConnection(conn *websocket.Conn, subject *observer.Subject) error {
 		if err := conn.ReadJSON(&message); err != nil {
 			return err
 		}
+
 		subject.Notify(message)
 	}
 }

@@ -2,9 +2,10 @@ package observer
 
 import (
 	"TickFlow/internal/database"
-	"github.com/prometheus/client_golang/prometheus"
 	"log"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var (
@@ -48,7 +49,9 @@ func (t *TradeObserver) Update(data map[string]interface{}) {
 	if err != nil {
 		tradeErrorCounter.Inc()
 		log.Fatalf("Update function error: %v", err)
+
 		return
 	}
+
 	tradeSuccessCounter.Inc()
 }

@@ -8,7 +8,7 @@ RUN go build -o TickFlow cmd/main.go
 FROM ubuntu:latest
 LABEL authors="can.zanat"
 
-# CA sertifikalarını yüklemek için gerekli adımlar
+# download the CA certificates
 RUN apt-get update && apt-get install -y ca-certificates
 RUN update-ca-certificates
 
