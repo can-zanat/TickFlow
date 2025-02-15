@@ -28,6 +28,7 @@ services:
       - app_network
     volumes:
       - db_data:/data/db
+      - ./scripts/init.js:/docker-entrypoint-initdb.d/init.js
     healthcheck:
       test: [ "CMD-SHELL", "echo 'db.runCommand({ping:1}).ok' | mongosh --quiet \
           --host localhost --port 27017 \
