@@ -1,4 +1,4 @@
-**This project outputs the full 24-hour ticker information for the BTC/USDT pair from Binance. It includes detailed data such as**
+**This project outputs the mini 24-hour ticker information for the BTC/USDT pair from Binance. It includes detailed data such as**
 **the last 24-hour price change, price information, volume, and the number of trades.**
 
 ##  How It Works
