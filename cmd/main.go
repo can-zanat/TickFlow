@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"TickFlow/internal/binance"
@@ -37,23 +40,44 @@ func main() {
 		}
 	}()
 
-	startMetricsServer()
+	// Start metrics and health server with graceful shutdown
+	startServerWithGracefulShutdown()
 }
 
-func startMetricsServer() {
+func startServerWithGracefulShutdown() {
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
 	http.Handle("/metrics", promhttp.Handler())
 
-	prometheusPort := "8080"
-	log.Printf("Starting metrics server on port %s ...", prometheusPort)
-
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%s", prometheusPort),
+		Addr:         ":8080",
 		ReadTimeout:  trashHoldTen,
 		WriteTimeout: trashHoldTen,
 		IdleTimeout:  trashHoldFifteen,
 	}
 
-	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatalf("Failed to start server: %v", err)
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		log.Println("Starting metrics and health server on port 8080...")
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("Failed to start server: %v", err)
+		}
+	}()
+
+	<-done
+	log.Println("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed: %v", err)
 	}
+
+	log.Println("Server gracefully stopped")
 }
