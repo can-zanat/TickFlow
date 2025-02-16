@@ -45,9 +45,9 @@ func main() {
 }
 
 func startServerWithGracefulShutdown() {
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
+		_, _ = w.Write([]byte("ok"))
 	})
 
 	http.Handle("/metrics", promhttp.Handler())
@@ -64,6 +64,7 @@ func startServerWithGracefulShutdown() {
 
 	go func() {
 		log.Println("Starting metrics and health server on port 8080...")
+
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("Failed to start server: %v", err)
 		}
@@ -72,11 +73,11 @@ func startServerWithGracefulShutdown() {
 	<-done
 	log.Println("Shutting down server...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), trashHoldTen)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("Server shutdown failed: %v", err)
+		log.Printf("Server shutdown failed: %v", err)
 	}
 
 	log.Println("Server gracefully stopped")

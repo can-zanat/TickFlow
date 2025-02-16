@@ -1,5 +1,5 @@
 # .config/local.yaml
 mongoDB:
-  uri: "mongodb://localhost:27017"
+  uri: "mongodb://root:password@localhost:27017/?replicaSet=rs0&authSource=admin"
 
 binanceURL: "wss://stream.binance.com:9443/ws/btcusdt@miniTicker"
