@@ -3,7 +3,6 @@
 
 ##  How It Works
 **_docker-compose up --build_ command will be enough to run the project.**
-**you have to wait about 10 second for the database to be ready.**
 **You can view the metrics as text on ```localhost:8080``` and access the metrics visually on ```localhost:9090```**
 
 ```bash
